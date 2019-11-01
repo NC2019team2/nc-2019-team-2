@@ -1,7 +1,7 @@
-package com.netcracker.edu.nc2019team2.delivery.database.entity;
+package com.netcracker.edu.nc2019team2.delivery.model;
 
 public class Entity {
-    private long id;
+    private Long id;
     private String name;
 
     public long getId() {

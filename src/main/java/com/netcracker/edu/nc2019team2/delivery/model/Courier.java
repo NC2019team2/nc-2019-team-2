@@ -1,4 +1,4 @@
-package com.netcracker.edu.nc2019team2.delivery.database.entity;
+package com.netcracker.edu.nc2019team2.delivery.model;
 
 public class Courier extends Person {
     private String vehicle;

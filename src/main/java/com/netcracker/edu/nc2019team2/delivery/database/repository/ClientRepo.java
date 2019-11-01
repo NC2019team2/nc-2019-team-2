@@ -2,7 +2,7 @@ package com.netcracker.edu.nc2019team2.delivery.database.repository;
 
 import org.springframework.data.jdbc.repository.query.Query;
 import org.springframework.data.repository.CrudRepository;
-import com.netcracker.edu.nc2019team2.delivery.database.entity.Client;
+import com.netcracker.edu.nc2019team2.delivery.model.Client;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 

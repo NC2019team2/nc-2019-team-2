@@ -1,4 +1,4 @@
-package com.netcracker.edu.nc2019team2.delivery.database.entity;
+package com.netcracker.edu.nc2019team2.delivery.model;
 
 import java.math.BigDecimal;
 
@@ -6,8 +6,8 @@ public class Item extends Entity {
     private int calories;
     private BigDecimal price;
     private String composition;
-    private float weight;
-    private boolean isSpicy;
+    private Float weight;
+    private Boolean isSpicy;
 
     public int getCalories() {
         return calories;

@@ -1,11 +1,11 @@
-package com.netcracker.edu.nc2019team2.delivery.database.entity;
+package com.netcracker.edu.nc2019team2.delivery.model;
 
 public class Person extends Entity {
 
     private String email;
-    private byte rating;
+    private Byte rating;
     private String lastName;
-    private long phone;
+    private Long phone;
 
     public long getPhone() {
         return phone;
