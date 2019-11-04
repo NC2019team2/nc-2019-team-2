@@ -1,9 +1,9 @@
-package com.netcracker.edu.nc2019team2.delivery.database.entity;
+package com.netcracker.edu.nc2019team2.delivery.model;
 
 public class Review {
-    private long id;
+    private Long id;
     private Client user;
-    private byte mark;
+    private Byte mark;
     private String text;
 
     public long getId() {

@@ -1,6 +1,6 @@
 package com.netcracker.edu.nc2019team2.delivery.controller;
 
-import com.netcracker.edu.nc2019team2.delivery.database.entity.Client;
+import com.netcracker.edu.nc2019team2.delivery.model.Client;
 import com.netcracker.edu.nc2019team2.delivery.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
