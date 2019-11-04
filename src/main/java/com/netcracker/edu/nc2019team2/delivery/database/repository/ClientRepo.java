@@ -8,15 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 public interface ClientRepo extends CrudRepository<Client, Long> {
 
-    @Query("select id, name from client where id=:id")
-    List<Client> findClientsById(@Param("id") long id);
+    List<Client> findClientsById(long id);
 
-    @Query("select id, name from client where rownum>=:min AND rownum<=:max")
-    List<Client> findClientsBetween(@Param("min") long min,@Param("max") long max);
+    List<Client> findClientsBetween(long min, long max);
 
-    @Query("delete client where id=:id")
-    void deleteClientById(@Param("id") long id);
+    void deleteClientById(long id);
 }

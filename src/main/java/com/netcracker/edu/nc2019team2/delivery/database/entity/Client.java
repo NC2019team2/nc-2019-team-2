@@ -7,6 +7,7 @@ import org.springframework.data.relational.core.mapping.Table;
 import java.util.Date;
 
 public class Client extends Person {
+
     private String defaultLocation;
     private Date registrationDate;
 

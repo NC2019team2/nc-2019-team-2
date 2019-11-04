@@ -14,21 +14,25 @@ public class ClientService {
     @Autowired
     ClientRepo clientRepo;
 
-    public Client getClientByID(String id){
+    public Client getClientByID(String id) {
         return clientRepo.findClientsById(Integer.parseUnsignedInt(id)).get(0);
     }
-    public List<Client> getFirstNumberUser(String from, String to){
-        return clientRepo.findClientsBetween(Integer.parseUnsignedInt(from),Integer.parseUnsignedInt(to));
+
+    public List<Client> getFirstNumberUser(String from, String to) {
+        return clientRepo.findClientsBetween(Integer.parseUnsignedInt(from), Integer.parseUnsignedInt(to));
     }
-    public void createClient(String name,String id){
-         clientRepo.save(new Client(Integer.parseUnsignedInt(id),name));
+
+    public void createClient(String name, String id) {
+        clientRepo.save(new Client(Integer.parseUnsignedInt(id), name));
     }
-    public void updateClient(String name, String id){
-        Client client=clientRepo.findClientsById(Integer.parseUnsignedInt(id)).get(0);
+
+    public void updateClient(String name, String id) {
+        Client client = clientRepo.findClientsById(Integer.parseUnsignedInt(id)).get(0);
         client.setName(name);
-         clientRepo.save(client);
+        clientRepo.save(client);
     }
-    public void deleteClient(String id){
+
+    public void deleteClient(String id) {
         clientRepo.deleteClientById(Integer.parseUnsignedInt(id));
     }
 }
