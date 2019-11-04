@@ -1,10 +1,10 @@
-package com.netcracker.edu.nc2019team2.delivery.model;
+package com.netcracker.edu.odelivery.model;
 
 public class Entity {
     private Long id;
     private String name;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

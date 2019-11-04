@@ -1,9 +1,9 @@
-package com.netcracker.edu.nc2019team2.delivery.model;
+package com.netcracker.edu.odelivery.model;
 
 public class Review {
     private Long id;
     private Client user;
-    private Byte mark;
+    private Integer mark;
     private String text;
 
     public long getId() {
@@ -22,11 +22,11 @@ public class Review {
         this.user = user;
     }
 
-    public byte getMark() {
+    public Integer getMark() {
         return mark;
     }
 
-    public void setMark(byte mark) {
+    public void setMark(Integer mark) {
         this.mark = mark;
     }
 

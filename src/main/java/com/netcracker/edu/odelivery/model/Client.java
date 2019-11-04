@@ -1,4 +1,4 @@
-package com.netcracker.edu.nc2019team2.delivery.model;
+package com.netcracker.edu.odelivery.model;
 
 
 import java.util.Date;

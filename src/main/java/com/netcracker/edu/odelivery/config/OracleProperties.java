@@ -1,4 +1,4 @@
-package com.netcracker.edu.nc2019team2.delivery.config;
+package com.netcracker.edu.odelivery.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

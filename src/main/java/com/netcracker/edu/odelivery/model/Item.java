@@ -1,15 +1,15 @@
-package com.netcracker.edu.nc2019team2.delivery.model;
+package com.netcracker.edu.odelivery.model;
 
 import java.math.BigDecimal;
 
 public class Item extends Entity {
-    private int calories;
+    private Integer calories;
     private BigDecimal price;
     private String composition;
     private Float weight;
     private Boolean isSpicy;
 
-    public int getCalories() {
+    public Integer getCalories() {
         return calories;
     }
 
@@ -25,7 +25,7 @@ public class Item extends Entity {
         this.composition = composition;
     }
 
-    public float getWeight() {
+    public Float getWeight() {
         return weight;
     }
 
@@ -33,7 +33,7 @@ public class Item extends Entity {
         this.weight = weight;
     }
 
-    public boolean isSpicy() {
+    public Boolean isSpicy() {
         return isSpicy;
     }
 

@@ -1,9 +1,9 @@
-package com.netcracker.edu.nc2019team2.delivery.model;
+package com.netcracker.edu.odelivery.model;
 
 public class Person extends Entity {
 
     private String email;
-    private Byte rating;
+    private Integer rating;
     private String lastName;
     private Long phone;
 
@@ -23,11 +23,11 @@ public class Person extends Entity {
         this.email = email;
     }
 
-    public byte getRating() {
+    public Integer getRating() {
         return rating;
     }
 
-    public void setRating(byte rating) {
+    public void setRating(Integer rating) {
         this.rating = rating;
     }
 

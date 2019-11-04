@@ -1,7 +1,7 @@
-package com.netcracker.edu.nc2019team2.delivery.controller;
+package com.netcracker.edu.odelivery.controller;
 
-import com.netcracker.edu.nc2019team2.delivery.model.Client;
-import com.netcracker.edu.nc2019team2.delivery.service.ClientService;
+import com.netcracker.edu.odelivery.model.Client;
+import com.netcracker.edu.odelivery.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +23,8 @@ public class UserController {
 
     @RequestMapping("/")
     public List<Client> getListUser(@RequestParam(value = "from", defaultValue = "1") String from,
-                                    @RequestParam(value = "to", defaultValue = "1") String to) {
-        return clientService.getFirstNumberUser(from, to);
+                                    @RequestParam(value = "to", defaultValue = "1") String limit) {
+        return clientService.getFirstNumberUser(from, limit);
     }
 
     @RequestMapping("/createUser")
