@@ -1,6 +1,8 @@
-package com.netcracker.edu.odelivery.model;
+package com.netcracker.edu.odelivery.model.courier;
 
-public class Courier extends Person {
+import com.netcracker.edu.odelivery.model.Person;
+
+public class Courier extends Person implements CourierAttributes {
     private String vehicle;
 
     public String getVehicle() {

@@ -1,9 +1,7 @@
 package com.netcracker.edu.odelivery.database.repository;
 
 import org.springframework.data.repository.CrudRepository;
-import com.netcracker.edu.odelivery.model.Client;
-
-import java.util.List;
+import com.netcracker.edu.odelivery.model.client.Client;
 
 public interface ClientRepo extends CrudRepository<Client, Long> {
 

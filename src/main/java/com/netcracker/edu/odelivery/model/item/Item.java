@@ -1,8 +1,10 @@
-package com.netcracker.edu.odelivery.model;
+package com.netcracker.edu.odelivery.model.item;
+
+import com.netcracker.edu.odelivery.model.Entity;
 
 import java.math.BigDecimal;
 
-public class Item extends Entity {
+public class Item extends Entity implements ItemAttributes {
     private Integer calories;
     private BigDecimal price;
     private String composition;

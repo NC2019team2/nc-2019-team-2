@@ -1,6 +1,8 @@
-package com.netcracker.edu.odelivery.model;
+package com.netcracker.edu.odelivery.model.review;
 
-public class Review {
+import com.netcracker.edu.odelivery.model.client.Client;
+
+public class Review implements ReviewAttributes {
     private Long id;
     private Client user;
     private Integer mark;
