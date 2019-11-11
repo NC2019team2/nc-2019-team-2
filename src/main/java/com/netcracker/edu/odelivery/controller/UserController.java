@@ -34,9 +34,10 @@ public class UserController {
     }
 
     @RequestMapping("/updateUser")
-    public void updateUser(@RequestParam(value = "id") String id,
+    public String updateUser(@RequestParam(value = "id") String id,
                            @RequestParam(value = "name") String name) {
         clientService.updateClient(name, id);
+        return "OK";
     }
 
     @RequestMapping("/deleteUser")

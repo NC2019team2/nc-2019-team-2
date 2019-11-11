@@ -1,17 +1,26 @@
 package com.netcracker.edu.odelivery.model;
 
+import com.netcracker.edu.odelivery.database.annotation.Attribute;
+import com.netcracker.edu.odelivery.model.client.ClientAttributes;
+
+import javax.validation.constraints.NotNull;
+
 public class Person extends Entity {
 
+    @Attribute(attrId = ClientAttributes.EMAIL)
     private String email;
+
     private Integer rating;
+    @Attribute(attrId = ClientAttributes.LAST_NAME)
     private String lastName;
+    @Attribute(attrId = ClientAttributes.PHONE_NUMBER)
     private Long phone;
 
-    public long getPhone() {
+    public Long getPhone() {
         return phone;
     }
 
-    public void setPhone(long phone) {
+    public void setPhone(Long phone) {
         this.phone = phone;
     }
 

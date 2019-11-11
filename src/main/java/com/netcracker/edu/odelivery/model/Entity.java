@@ -1,6 +1,9 @@
 package com.netcracker.edu.odelivery.model;
 
+import com.netcracker.edu.odelivery.database.annotation.Id;
+
 public class Entity {
+    @Id
     private Long id;
     private String name;
 
@@ -8,7 +11,7 @@ public class Entity {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
