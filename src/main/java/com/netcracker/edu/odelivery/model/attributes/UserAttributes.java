@@ -1,7 +1,7 @@
-package com.netcracker.edu.odelivery.model.courier;
+package com.netcracker.edu.odelivery.model.attributes;
 
-public interface CourierAttributes {
-    int OBJECT_TYPE_ID = 3;
+public interface UserAttributes {
+    int OBJECT_TYPE_ID = 1;
 
     int LOGIN = 100;
     int PASSWORD = 101;
@@ -10,7 +10,5 @@ public interface CourierAttributes {
     int AUTHORITY = 104;
     int LAST_NAME = 105;
     int FIRST_NAME = 106;
-
-    int VEHICLE = 300;
-    int COURIER_RATING = 301;
+    int REGISTRATION_DATE = 106;
 }

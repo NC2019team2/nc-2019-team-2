@@ -1,10 +1,12 @@
 package com.netcracker.edu.odelivery.model;
 
 import com.netcracker.edu.odelivery.database.annotation.Id;
+import com.netcracker.edu.odelivery.database.annotation.Name;
 
 public class Entity {
     @Id
     private Long id;
+    @Name
     private String name;
 
     public Long getId() {

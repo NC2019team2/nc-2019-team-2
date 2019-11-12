@@ -1,8 +1,7 @@
 package com.netcracker.edu.odelivery.service;
 
 import com.netcracker.edu.odelivery.database.manager.EntityManager;
-import com.netcracker.edu.odelivery.database.manager.impl.RequestBuilder;
-import com.netcracker.edu.odelivery.model.client.Client;
+import com.netcracker.edu.odelivery.model.Client;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +27,9 @@ public class ClientService {
         Client client =new Client();
         client.setEmail("olegdobrev@gmail.com");
         client.setDefaultLocation("Odessa");
-        client.setLastName("Dobrev");
+        client.setLastName("Dobrev1");
+        client.setName("Oleg");
+        //client.setId(13L);
         //client.setName("Oleg");
         client.setPhone(970535827L);
         //client.setRating(5);

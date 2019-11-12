@@ -1,4 +1,4 @@
-package com.netcracker.edu.odelivery.model.review;
+package com.netcracker.edu.odelivery.model.attributes;
 
 public interface ReviewAttributes {
     int OBJECT_TYPE_ID = 8;
