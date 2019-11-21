@@ -2,12 +2,14 @@ package com.netcracker.edu.odelivery.database.manager.impl;
 
 import com.netcracker.edu.odelivery.database.annotation.*;
 import com.netcracker.edu.odelivery.database.manager.EntityManager;
-import com.netcracker.edu.odelivery.model.Entity;
+import com.netcracker.edu.odelivery.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -15,8 +17,11 @@ import org.springframework.stereotype.Repository;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.PreparedStatement;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 @Repository
@@ -60,7 +65,7 @@ public class RequestBuilder<T> implements EntityManager<T> {
                     }
                     jdbcTemplate.execute("COMMIT "); //делаем коммит
                 } catch (IllegalAccessException e) {
-                    log.error("Exception by access to field",e);
+                    log.error("Exception by  access to field",e);
                 }
             }
         }
@@ -68,7 +73,7 @@ public class RequestBuilder<T> implements EntityManager<T> {
     }
 
 
-    public List<T> getEntityListBySql(String sqlQuery,Class clazz) {
+    public List<T> getEntityListBySql(String sqlQuery, Class clazz) {
         return null;
     }
 
@@ -77,11 +82,50 @@ public class RequestBuilder<T> implements EntityManager<T> {
         return null;
     }
 
+    // initial implementation of dynamic query
+    StringBuilder createQuery() {
+        StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION");
+        query.append(" FROM OBJECTS O");
+        // then join all attributes
+        return query;
+    }
 
-    public T gerEntityById(Long id, Class clazz) {
+    // example of select from one table
+    @Autowired
+    public List<Entity> getAllObjects() {
+        String sql = "SELECT OBJECT_ID, NAME FROM OBJECTS ";
+        return jdbcTemplate.query(sql, new ResultSetExtractor<List<Entity>>() {
+            @Override
+            public List<Entity> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+                List entitiesList = new ArrayList<Entity>();
+                while (resultSet.next()) {
+                    Entity entity = new Entity();
+                    entity.setId(resultSet.getLong("OBJECT_ID"));
+                    entity.setName(resultSet.getString("NAME"));
+                    entitiesList.add(entity);
+                }
+                return entitiesList;
+            }
+        });
+    }
+
+    private <T extends Entity> T createNewEntity(Class<T> clazz) {
+        try {
+            return (T) clazz.getDeclaredConstructor().newInstance();
+        } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException  e) {
+            log.error("Unable to create instance of clazz", e);
+        }
         return null;
     }
 
+
+    public <T extends Entity> T getEntityById(Long id, Class<T> clazz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        T entity = createNewEntity(clazz);
+        if (entity == null) {
+            return null;
+        }
+        return entity;
+    }
 
     public void delete(T object) {
 

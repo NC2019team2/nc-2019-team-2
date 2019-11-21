@@ -26,7 +26,7 @@ public class User extends Entity {
     @AttributeList(attrId =UserAttributes.AUTHORITY)
     private String authority;
 
-    User(){
+    public User(){
         registrationDate=new Date();
     }
 

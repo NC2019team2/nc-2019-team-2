@@ -2,10 +2,12 @@ package com.netcracker.edu.odelivery.service;
 
 import com.netcracker.edu.odelivery.database.manager.EntityManager;
 import com.netcracker.edu.odelivery.model.Client;
+import com.netcracker.edu.odelivery.model.Entity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +17,17 @@ public class ClientService {
 
     @Autowired
     EntityManager<Client> entityManager;
-    public Client getClientByID(String id) {
-        return new Client();
+
+    public Client getClientByID(String id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+        return entityManager.getEntityById(Long.parseLong(id), Client.class);
     }
 
     public List<Client> getFirstNumberUser(String from, String to) {
         return new ArrayList<Client>();
+    }
+
+    public List<Entity> getAllObjects() {
+        return entityManager.getAllObjects();
     }
 
     public void createClient(String name, String id) {
