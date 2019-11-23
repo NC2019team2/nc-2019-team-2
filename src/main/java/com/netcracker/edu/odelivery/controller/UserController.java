@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping("/")
     public List<Client> getListClient(@RequestParam(value = "from", defaultValue = "1") String from,
-                                    @RequestParam(value = "limit", defaultValue = "1") String limit) {
+                                    @RequestParam(value = "limit", defaultValue = "10") String limit) {
         return clientService.getFirstNumberUser(from, limit);
     }
 
