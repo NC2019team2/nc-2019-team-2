@@ -41,7 +41,10 @@ public class ClientService {
         client.setPhone(970535827L);
         //client.setRating(5);
 
-        entityManager.save(client);
+        List<Entity> a=entityManager.getAllObjects();
+        for (Entity entity:a){
+            System.out.println(entity.getId()+" Name: "+entity.getName());
+        }
 
     }
 
