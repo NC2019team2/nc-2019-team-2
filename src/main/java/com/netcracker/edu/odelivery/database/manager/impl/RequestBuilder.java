@@ -83,12 +83,73 @@ public class RequestBuilder<T> implements EntityManager<T> {
     }
 
     // initial implementation of dynamic query
-    StringBuilder createQuery() {
-        StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION");
+    public StringBuilder createQuery(String where) {
+        StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION ");
+        // select from other tables (attributes/obj_references)
+        List values = new ArrayList<Long>(Arrays.asList(105L, 106L, 200L, 201L));
+        List date_values = new ArrayList<Long>(Arrays.asList(108L, 109L));
+        List list_values = new ArrayList<Long>(Arrays.asList(104L));
+        List references = new ArrayList<Long>(Arrays.asList(120L, 122L, 140L, 150L, 174L));
+        selectFromTables(query, values, date_values, list_values, references );
         query.append(" FROM OBJECTS O");
-        // then join all attributes
+        // then join all tables
+        joinTables(query, values, date_values, list_values, references);
+        query.append(" ").append(where);
         return query;
     }
+
+    public void joinTables(StringBuilder query, List<Long> values, List<Long> date_values, List<Long> list_values, List<Long> references) {
+        joinAttributes(query, values, "ATTRIBUTES");
+        joinAttributes(query, date_values, "ATTRIBUTES");
+        joinAttributes(query, list_values, "ATTRIBUTES");
+        joinAttributes(query, references, "OBJ_REFERENCE");
+    }
+
+    public StringBuilder joinAttributes(StringBuilder query, List<Long> attributes, String table) {
+        int aliasIndex = 1;
+        for (Long attribute : attributes) {
+            String alias = "A" + aliasIndex;
+            query.append("\n LEFT JOIN ")
+                    .append(table)
+                    .append(" ")
+                    .append(alias)
+                    .append(" ON ")
+                    .append(alias)
+                    .append(".ATTR_ID = ")
+                    .append(attribute)
+                    .append(" AND ")
+                    .append(alias)
+                    .append(".OBJECT_ID = O.OBJECT_ID");
+            aliasIndex++;
+        }
+        return query;
+    }
+
+    // need a list of constants-codes (from classAttributes interface)
+    public void selectFromTables (StringBuilder query, List<Long> values, List<Long> date_values,  List<Long> list_values, List<Long> references) {
+        // select all attributes values
+        selectAttributes(query, values, "VALUE");
+        // select all attributes date_values
+        selectAttributes(query, date_values, "DATE_VALUE");
+        // select all attributes list_values
+        selectAttributes(query, list_values, "LIST_VALUE_ID");
+        // select all references
+        selectAttributes(query, references, "REFERENCE");
+    }
+
+    public void selectAttributes(StringBuilder query, List<Long> attributes, String column) {
+        int aliasIndex = 1;
+        for (Long attribute : attributes) {
+            query.append("\n,A")
+                 .append(aliasIndex)
+                 .append(".")
+                 .append(column)
+                 .append(" ATTR_ID_")
+                 .append(attribute)
+                 .append(" ");
+        }
+    }
+
 
     // example of select from one table
     @Autowired
