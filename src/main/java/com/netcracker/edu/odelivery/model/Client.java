@@ -13,8 +13,9 @@ public class Client extends User {
     private String defaultLocation;
 
     public Client(){
-        super();
+
     }
+
     public String getDefaultLocation() {
         return defaultLocation;
     }
