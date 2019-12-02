@@ -11,6 +11,10 @@ public class Courier extends User {
     @Attribute(attrId = CourierAttributes.COURIER_RATING)
     private Integer rating;
 
+    public Courier() {
+
+    }
+
     public String getVehicle() {
         return vehicle;
     }

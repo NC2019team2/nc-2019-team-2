@@ -83,12 +83,122 @@ public class RequestBuilder<T> implements EntityManager<T> {
     }
 
     // initial implementation of dynamic query
-    StringBuilder createQuery() {
-        StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION");
+    public StringBuilder createQuery(String where, List<List<Integer>> resultList) {
+        StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION ");
+
+        int aliasIndex = 1; // common index during all selections and joinings
+        List<Integer> values = resultList.get(0);
+        List<Integer> date_values = resultList.get(1);
+        List<Integer> list_values = resultList.get(2);
+        List<Integer> references = resultList.get(3);
+
+        // select from other tables (attributes/obj_references)
+        selectFromTables(query, values, date_values, list_values, references, aliasIndex);
         query.append(" FROM OBJECTS O");
-        // then join all attributes
+        // then join all tables
+        joinTables(query, values, date_values, list_values, references, aliasIndex);
+        query.append(" ").append(where);
         return query;
     }
+
+    public void joinTables(StringBuilder query, List<Integer> values, List<Integer> date_values, List<Integer> list_values, List<Integer> references, int aliasIndex) {
+        aliasIndex = joinAttributes(query, values, "ATTRIBUTES", aliasIndex);
+        aliasIndex = joinAttributes(query, date_values, "ATTRIBUTES", aliasIndex);
+        aliasIndex = joinAttributes(query, list_values, "ATTRIBUTES", aliasIndex);
+        joinAttributes(query, references, "OBJ_REFERENCE", aliasIndex);
+    }
+
+    public int joinAttributes(StringBuilder query, List<Integer> attributes, String table, int aliasIndex) {
+        for (Integer attribute : attributes) {
+            String alias = "A" + aliasIndex;
+            query.append("\n LEFT JOIN ")
+                    .append(table)
+                    .append(" ")
+                    .append(alias)
+                    .append(" ON ")
+                    .append(alias)
+                    .append(".ATTR_ID = ")
+                    .append(attribute)
+                    .append(" AND ")
+                    .append(alias)
+                    .append(".OBJECT_ID = O.OBJECT_ID");
+            aliasIndex++;
+        }
+        return aliasIndex;
+    }
+
+    public void selectFromTables (StringBuilder query, List<Integer> values, List<Integer> date_values,  List<Integer> list_values, List<Integer> references, int aliasIndex) {
+        // select all attributes values
+        aliasIndex = selectAttributes(query, values, "VALUE", aliasIndex);
+        // select all attributes date_values
+        aliasIndex = selectAttributes(query, date_values, "DATE_VALUE", aliasIndex);
+        // select all attributes list_values
+        aliasIndex = selectAttributes(query, list_values, "LIST_VALUE_ID", aliasIndex);
+        // select all references
+        selectAttributes(query, references, "REFERENCE", aliasIndex);
+    }
+
+    public int selectAttributes(StringBuilder query, List<Integer> attributes, String column, int aliasIndex) {
+        for (Integer attribute : attributes) {
+            query.append("\n,A")
+                 .append(aliasIndex++)
+                 .append(".")
+                 .append(column)
+                 .append(" ATTR_ID_")
+                 .append(attribute)
+                 .append(" ");
+        }
+        return aliasIndex;
+    }
+
+    /*
+    return a list of all attributes, which contains four lists: attributes, date values, list values, references
+    every nested list is sorted
+    */
+    public List<List<Integer>> getListOfAttributes (Class clazz) {
+        Set<Field> fieldsOfClass = getFieldsRecursion(new HashSet<>(), clazz);
+
+        List<Integer> listOfAttributes = new ArrayList<>();
+        List<Integer> listOfDates = new ArrayList<>();
+        List<Integer> listOfLists = new ArrayList<>();
+        List<Integer> listOfReferences = new ArrayList<>();
+
+        for (Field field: fieldsOfClass) {
+            if (field.isAnnotationPresent(Attribute.class)) {
+                Attribute annotationAttribute = field.getAnnotation(Attribute.class);
+                int attributeId = annotationAttribute.attrId();
+                if (Date.class.isAssignableFrom(field.getType())) {
+                    listOfDates.add(attributeId);
+                } else {
+                    listOfAttributes.add(attributeId);
+                }
+            }
+            if (field.isAnnotationPresent(AttributeList.class)) {
+                AttributeList annotationAttribute = field.getAnnotation(AttributeList.class);
+                int attributeId = annotationAttribute.attrId();
+                listOfLists.add(attributeId);
+            }
+            if (field.isAnnotationPresent(Reference.class)) {
+                Reference annotationAttribute = field.getAnnotation(Reference.class);
+                int attributeId = annotationAttribute.attrId();
+                listOfReferences.add(attributeId);
+            }
+        }
+
+        Collections.sort(listOfAttributes);
+        Collections.sort(listOfDates);
+        Collections.sort(listOfLists);
+        Collections.sort(listOfReferences);
+
+        List<List<Integer>> resultList = new ArrayList<>();
+        resultList.add(listOfAttributes);
+        resultList.add(listOfDates);
+        resultList.add(listOfLists);
+        resultList.add(listOfReferences);
+
+        return resultList;
+    }
+
 
     // example of select from one table
     @Autowired
@@ -111,7 +221,7 @@ public class RequestBuilder<T> implements EntityManager<T> {
 
     private <T extends Entity> T createNewEntity(Class<T> clazz) {
         try {
-            return (T) clazz.getDeclaredConstructor().newInstance();
+            return clazz.getDeclaredConstructor().newInstance();
         } catch (IllegalAccessException | InstantiationException | NoSuchMethodException | InvocationTargetException  e) {
             log.error("Unable to create instance of clazz", e);
         }
@@ -124,6 +234,9 @@ public class RequestBuilder<T> implements EntityManager<T> {
         if (entity == null) {
             return null;
         }
+        entity.setId(id);
+        List<List<Integer>> attributes = getListOfAttributes(entity.getClass());
+        createQuery("WHERE O.OBJECT_ID = ?", attributes);
         return entity;
     }
 
