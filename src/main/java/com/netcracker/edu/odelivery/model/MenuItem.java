@@ -7,7 +7,7 @@ import com.netcracker.edu.odelivery.model.attributes.ItemAttributes;
 import java.math.BigDecimal;
 
 @ObjectType(objType = ItemAttributes.OBJECT_TYPE_ID)
-public class Item extends Entity  {
+public class MenuItem extends Entity  {
     @Attribute(attrId = ItemAttributes.CALORIES)
     private Integer calories;
     @Attribute(attrId = ItemAttributes.ITEM_PRICE)

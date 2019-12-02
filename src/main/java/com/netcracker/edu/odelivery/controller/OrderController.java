@@ -1,6 +1,7 @@
 package com.netcracker.edu.odelivery.controller;
 
 import com.netcracker.edu.odelivery.model.Order;
+import com.netcracker.edu.odelivery.service.OrderFacade;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -10,10 +11,9 @@ import java.util.List;
 public class OrderController {
 
     @PostMapping("/create-order")
-    public void createOrder(@RequestParam(name = "order")Order order){
-
+    public Order createOrder(@RequestParam(name = "menuItemsList")List<Long> menuItemsList){
+        return new OrderFacade().placeOrder(menuItemsList);
     }
-
     @PutMapping("/update-order")
     public void updateOrder(@RequestParam(name = "order")Order order){
 
