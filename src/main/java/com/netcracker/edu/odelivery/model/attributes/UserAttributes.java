@@ -10,5 +10,5 @@ public interface UserAttributes {
     int AUTHORITY = 104;
     int LAST_NAME = 105;
     int FIRST_NAME = 106;
-    int REGISTRATION_DATE = 106;
+    int REGISTRATION_DATE = 107;
 }

@@ -219,6 +219,36 @@ public class RequestBuilder<T> implements EntityManager<T> {
         });
     }
 
+    // returns field by ID, if it exists
+    public Field getFieldById (Integer id, Class<? extends Entity> clazz, Class<? extends Annotation> annotation) {
+        Set<Field> fields = getFieldsRecursion(new HashSet<>(), clazz);
+        for (Field field: fields) {
+            Integer annotationId = getIdFromAnnotation(field.getAnnotation(annotation));
+            if (id.equals(annotationId)) {
+                return field;
+            }
+        }
+        IllegalArgumentException e = new IllegalArgumentException("There is no field with given ID");
+        throw e;
+    }
+
+    // returns attribute ID
+    public Integer getIdFromAnnotation(Annotation annotation) {
+        Class annotationClass = annotation.annotationType();
+        int idOfAttribute;
+
+        if (annotationClass.equals(Attribute.class)) {
+            idOfAttribute = ((Attribute) annotation).attrId();
+        } else if (annotationClass.equals(AttributeList.class)) {
+            idOfAttribute = ((AttributeList) annotation).attrId();
+        } else if (annotationClass.equals(Reference.class)) {
+            idOfAttribute = ((Reference) annotation).attrId();
+        } else {
+            return null;
+        }
+        return idOfAttribute;
+    }
+
     private <T extends Entity> T createNewEntity(Class<T> clazz) {
         try {
             return clazz.getDeclaredConstructor().newInstance();
@@ -228,7 +258,6 @@ public class RequestBuilder<T> implements EntityManager<T> {
         return null;
     }
 
-
     public <T extends Entity> T getEntityById(Long id, Class<T> clazz) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         T entity = createNewEntity(clazz);
         if (entity == null) {
@@ -237,7 +266,49 @@ public class RequestBuilder<T> implements EntityManager<T> {
         entity.setId(id);
         List<List<Integer>> attributes = getListOfAttributes(entity.getClass());
         createQuery("WHERE O.OBJECT_ID = ?", attributes);
+
+        // set all values
+        setValues(entity);
+        // set all dates
+        setDates(entity);
+        // set all list_values
+        setLists(entity);
+        // set all references
+        setReferences(entity);
         return entity;
+    }
+
+    public void setField(Entity entity, Field field, Object value) throws IllegalAccessException {
+        field.setAccessible(true);
+        field.set(entity, value);
+        field.setAccessible(false);
+    }
+
+    public <T extends Entity> void setValues(T entity) {
+        Class <? extends Entity> entityClass = entity.getClass();
+        List<Integer> values = getListOfAttributes(entityClass).get(0);  // get list of Ids of Attributes
+        for (int i = 0; i < values.size(); i++) {
+            Field valueField = getFieldById(values.get(i), entityClass, Attribute.class);
+            // then set field with the value from DB
+            //setField(entity, valueField, valueFromDB);
+        }
+    }
+
+    public <T extends Entity> void setDates(T entity) {
+
+    }
+
+    public <T extends Entity> void setLists(T entity) {
+        Class <? extends Entity> entityClass = entity.getClass();
+        List<Integer> lists = getListOfAttributes(entityClass).get(2);  // get list of Ids of lists
+        for (int i = 0; i < lists.size(); i++) {
+            Field listField = getFieldById(lists.get(i), entityClass, AttributeList.class);
+
+        }
+    }
+
+    public <T extends Entity> void setReferences(T entity) {
+
     }
 
     public void delete(T object) {

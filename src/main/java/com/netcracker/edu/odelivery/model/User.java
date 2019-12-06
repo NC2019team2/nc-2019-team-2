@@ -66,6 +66,10 @@ public class User extends Entity {
         return registrationDate;
     }
 
+    public void setRegistrationDate(Date registrationDate) {
+        this.registrationDate = registrationDate;
+    }
+
     public String getLogin() {
         return login;
     }
