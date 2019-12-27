@@ -29,6 +29,10 @@ public class RequestBuilder<T> implements EntityManager<T> {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+    private static int IDS_OF_VALUES = 0;
+    private static int IDS_OF_DATES = 1;
+    private static int IDS_OF_LISTS = 2;
+    private static int IDS_OF_REFERENCES = 3;
 
     public void save(T object) {
         if (object != null) {
@@ -156,7 +160,6 @@ public class RequestBuilder<T> implements EntityManager<T> {
     */
     public List<List<Integer>> getListOfAttributes (Class clazz) {
         Set<Field> fieldsOfClass = getFieldsRecursion(new HashSet<>(), clazz);
-
         List<Integer> listOfAttributes = new ArrayList<>();
         List<Integer> listOfDates = new ArrayList<>();
         List<Integer> listOfLists = new ArrayList<>();
@@ -243,7 +246,9 @@ public class RequestBuilder<T> implements EntityManager<T> {
         } else if (annotationClass.equals(Reference.class)) {
             idOfAttribute = ((Reference) annotation).attrId();
         } else {
-            return null;
+            IllegalArgumentException e = new IllegalThreadStateException();
+            log.error("Invalid annotation type", e);
+            throw e;
         }
         return idOfAttribute;
     }
@@ -274,9 +279,9 @@ public class RequestBuilder<T> implements EntityManager<T> {
                         setValues(entity, resultSet);
                         setDates(entity, resultSet);
 //                        setLists(entity, resultSet);  // need to fix
-//                        setReferences(entity);
+                        setReferences(entity, resultSet);
                     } catch (IllegalAccessException e) {
-                        e.printStackTrace();
+                        log.error("Error during setting values from DB", e);
                     }
                 }
                 return entity;
@@ -292,7 +297,7 @@ public class RequestBuilder<T> implements EntityManager<T> {
 
     public <T extends Entity> void setValues(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
-        List<Integer> values = getListOfAttributes(entityClass).get(0);  // get list of Ids of Attributes
+        List<Integer> values = getListOfAttributes(entityClass).get(IDS_OF_VALUES);  // get list of Ids of Attributes
         for (int i = 0; i < values.size(); i++) {
             Field valueField = getFieldById(values.get(i), entityClass, Attribute.class);
             // then set field with the value from DB
@@ -308,7 +313,7 @@ public class RequestBuilder<T> implements EntityManager<T> {
 
     public <T extends Entity> void setDates(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
-        List<Integer> dates = getListOfAttributes(entityClass).get(1); // get list of Ids of dates
+        List<Integer> dates = getListOfAttributes(entityClass).get(IDS_OF_DATES); // get list of Ids of dates
         for (int i = 0; i < dates.size(); i++) {
             Field dateField = getFieldById(dates.get(i), entityClass, Attribute.class);
             setField(entity, dateField, rs.getDate(i+6));
@@ -318,20 +323,25 @@ public class RequestBuilder<T> implements EntityManager<T> {
 
     public <T extends Entity> void setLists(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
-        List<Integer> lists = getListOfAttributes(entityClass).get(2);  // get list of Ids of lists
+        List<Integer> lists = getListOfAttributes(entityClass).get(IDS_OF_LISTS);  // get list of Ids of lists
         for (int i = 0; i < lists.size(); i++) {
             Field listField = getFieldById(lists.get(i), entityClass, AttributeList.class);
             if (listField.getType().equals(String.class)) {
                 setField(entity, listField, rs.getString(i + 6));
+            } else if (listField.getType().equals(Long.class)) {
+                setField(entity, listField, rs.getLong(i + 6));
             }
         }
     }
 
-    public <T extends Entity> void setReferences(T entity, ResultSet rs) {
+    public <T extends Entity> void setReferences(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
-        List<Integer> references = getListOfAttributes(entityClass).get(3); // get list of Ids of references
+        List<Integer> references = getListOfAttributes(entityClass).get(IDS_OF_REFERENCES); // get list of Ids of references
         for (int i = 0; i < references.size(); i++) {
             Field referenceField = getFieldById(references.get(i), entityClass, Reference.class);
+            if (referenceField.getType().equals(String.class)) {
+                setField(entity, referenceField, rs.getString(i+6));
+            }
         }
     }
 
