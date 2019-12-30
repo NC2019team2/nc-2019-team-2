@@ -29,10 +29,10 @@ public class RequestBuilder<T> implements EntityManager<T> {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
-    private static int IDS_OF_VALUES = 0;
-    private static int IDS_OF_DATES = 1;
-    private static int IDS_OF_LISTS = 2;
-    private static int IDS_OF_REFERENCES = 3;
+    private static final int IDS_OF_VALUES = 0;
+    private static final int IDS_OF_DATES = 1;
+    private static final int IDS_OF_LISTS = 2;
+    private static final int IDS_OF_REFERENCES = 3;
 
     public void save(T object) {
         if (object != null) {
@@ -90,10 +90,10 @@ public class RequestBuilder<T> implements EntityManager<T> {
         StringBuilder query = new StringBuilder("SELECT O.OBJECT_ID, O.PARENT_ID, O.OBJECT_TYPE_ID, O.NAME, O.DESCRIPTION ");
 
         int aliasIndex = 1; // common index during all selections and joinings
-        List<Integer> values = resultList.get(0);
-        List<Integer> date_values = resultList.get(1);
-        List<Integer> list_values = resultList.get(2);
-        List<Integer> references = resultList.get(3);
+        List<Integer> values = resultList.get(IDS_OF_VALUES);
+        List<Integer> date_values = resultList.get(IDS_OF_DATES);
+        List<Integer> list_values = resultList.get(IDS_OF_LISTS);
+        List<Integer> references = resultList.get(IDS_OF_REFERENCES);
 
         // select from other tables (attributes/obj_references)
         selectFromTables(query, values, date_values, list_values, references, aliasIndex);
@@ -221,16 +221,30 @@ public class RequestBuilder<T> implements EntityManager<T> {
         });
     }
 
+    public List<Field> filterFieldsByAnnotation(List<Field> fields, Class<? extends Annotation> annotation) {
+        List<Field> filteredFields = new ArrayList<>();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(annotation)) {
+                filteredFields.add(field);
+            }
+        }
+        return filteredFields;
+    }
+
     // returns field by ID, if it exists
     public Field getFieldById (Integer id, Class<? extends Entity> clazz, Class<? extends Annotation> annotation) {
-        Set<Field> fields = getFieldsRecursion(new HashSet<>(), clazz);
-        for (Field field: fields) {
+        List<Field> allFields = new ArrayList<>(getFieldsRecursion(new HashSet<>(), clazz));
+        List<Field> annotatedFields = filterFieldsByAnnotation(allFields, annotation);
+        for (Field field : annotatedFields) {
             Integer annotationId = getIdFromAnnotation(field.getAnnotation(annotation));
             if (id.equals(annotationId)) {
                 return field;
             }
         }
-        IllegalArgumentException e = new IllegalArgumentException("There is no field with given ID");
+        String msg = new StringBuilder("There is no field with ID ").append(id).append(" and annotation ")
+                .append(annotation.getSimpleName()).toString();
+        IllegalArgumentException e = new IllegalArgumentException(msg);
+        log.error(msg, e);
         throw e;
     }
 
@@ -267,25 +281,26 @@ public class RequestBuilder<T> implements EntityManager<T> {
         if (entity == null) {
             return null;
         }
-        entity.setId(id);
         List<List<Integer>> attributes = getListOfAttributes(entity.getClass());
         StringBuilder sql = createQuery("WHERE O.OBJECT_ID = " + id.toString(), attributes);
 
-        return jdbcTemplate.query(sql.toString(), new ResultSetExtractor<T>() {
-            @Override
-            public T extractData(ResultSet resultSet) throws SQLException, DataAccessException {
-                while (resultSet.next()) {
-                    try {
-                        setValues(entity, resultSet);
-                        setDates(entity, resultSet);
-//                        setLists(entity, resultSet);  // need to fix
-                        setReferences(entity, resultSet);
-                    } catch (IllegalAccessException e) {
-                        log.error("Error during setting values from DB", e);
-                    }
+        return jdbcTemplate.query(sql.toString(), resultSet -> {
+            while (resultSet.next()) {
+                try {
+                    entity.setId(resultSet.getLong("OBJECT_ID"));
+                    entity.setParentId(resultSet.getLong("PARENT_ID"));
+                    entity.setObjectTypeId(resultSet.getLong("OBJECT_TYPE_ID"));
+                    entity.setName(resultSet.getString("NAME"));
+                    entity.setDescription(resultSet.getString("DESCRIPTION"));
+                    setValues(entity, resultSet);
+                    setDates(entity, resultSet);
+                    setLists(entity, resultSet);
+                    setReferences(entity, resultSet);
+                } catch (IllegalAccessException e) {
+                    log.error("Error during setting values from DB", e);
                 }
-                return entity;
             }
+            return entity;
         });
     }
 

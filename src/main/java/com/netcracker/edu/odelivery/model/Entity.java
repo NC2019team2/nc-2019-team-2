@@ -8,6 +8,9 @@ public class Entity {
     private Long id;
     @Name
     private String name;
+    private Long parentId;
+    private Long objectTypeId;
+    private String description;
 
     public Entity() {
 
@@ -32,4 +35,29 @@ public class Entity {
     public void setName(String name) {
         this.name = name;
     }
+
+    public Long getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Long parentId) {
+        this.parentId = parentId;
+    }
+
+    public Long getObjectTypeId() {
+        return objectTypeId;
+    }
+
+    public void setObjectTypeId(Long objectTypeId) {
+        this.objectTypeId = objectTypeId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 }
