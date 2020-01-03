@@ -3,6 +3,7 @@ package com.netcracker.edu.odelivery.service;
 import com.netcracker.edu.odelivery.database.manager.EntityManager;
 import com.netcracker.edu.odelivery.model.Client;
 import com.netcracker.edu.odelivery.model.Entity;
+import com.netcracker.edu.odelivery.model.Order;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,12 @@ import java.util.List;
 public class ClientService {
 
     @Autowired
-    EntityManager<Client> entityManager;
+    EntityManager entityManager;
+
+    OrderService orderService;
 
     public Client getClientByID(String id) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        return entityManager.getEntityById(Long.parseLong(id), Client.class);
+        return (Client) entityManager.getEntityById(Long.parseLong(id), Client.class);
     }
 
     public List<Client> getFirstNumberUser(String from, String to) {
@@ -52,5 +55,29 @@ public class ClientService {
     }
 
     public void deleteClient(String id) {
+    }
+
+    public void makeOrder(Long clientId, Long restaurantId) {
+        Order order = new Order();
+        Long id = order.getId();
+        order.setClientId(clientId);
+        order.setRestaurantId(restaurantId);
+        order.setOrderPrice(orderService.calculateCost(id));
+        // orderStatus is NEW right now, so restaurant manager must validate order and then change status to READY TO DELIVERY
+        // free courier can accept order from list of available orders and change status to ACCEPTED
+
+        entityManager.save(order);
+    }
+
+    public void updateOrder(Order order) {
+
+    }
+
+    public void confirmOrder(Order order) {
+        orderService.changeStatus(order.getId(), 1L);
+    }
+
+    public void cancelOrder() {
+
     }
 }
