@@ -19,7 +19,7 @@ public class Order extends Entity{
     private Long courierId;
 
     @Attribute(attrId = OrderAttributes.ORDER_STATUS)
-    private Long orderStatus;
+    private String orderStatus;
 
     @Attribute(attrId = OrderAttributes.ORDER_PRICE)
     private BigDecimal orderPrice;
@@ -54,11 +54,11 @@ public class Order extends Entity{
         this.courierId = courierId;
     }
 
-    public Long getOrderStatus() {
+    public String getOrderStatus() {
         return orderStatus;
     }
 
-    public void setOrderStatus(Long orderStatus) {
+    public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
     }
 

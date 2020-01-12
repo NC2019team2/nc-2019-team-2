@@ -34,6 +34,8 @@ public class RequestBuilder<T> implements EntityManager<T> {
     private static final int IDS_OF_LISTS = 2;
     private static final int IDS_OF_REFERENCES = 3;
 
+    private static final int INITIAL_RS_SHIFT = 6; // initial shift on result set (first 5 columns from table OBJECTS)
+
     public void save(T object) {
         if (object != null) {
             Class<?> clazz = object.getClass();
@@ -292,10 +294,19 @@ public class RequestBuilder<T> implements EntityManager<T> {
                     entity.setObjectTypeId(resultSet.getLong("OBJECT_TYPE_ID"));
                     entity.setName(resultSet.getString("NAME"));
                     entity.setDescription(resultSet.getString("DESCRIPTION"));
-                    setValues(entity, resultSet);
-                    setDates(entity, resultSet);
-                    setLists(entity, resultSet);
-                    setReferences(entity, resultSet);
+
+                    int shift = INITIAL_RS_SHIFT;
+                    setValues(entity, resultSet, shift);
+                    shift += attributes.get(IDS_OF_VALUES).size();
+
+                    setDates(entity, resultSet, shift);
+                    shift += attributes.get(IDS_OF_DATES).size();
+
+                    setLists(entity, resultSet, shift);
+                    shift += attributes.get(IDS_OF_LISTS).size();
+
+                    setReferences(entity, resultSet, shift);
+
                 } catch (IllegalAccessException e) {
                     log.error("Error during setting values from DB", e);
                 }
@@ -310,52 +321,52 @@ public class RequestBuilder<T> implements EntityManager<T> {
         field.setAccessible(false);
     }
 
-    public <T extends Entity> void setValues(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
+    public <T extends Entity> void setValues(T entity, ResultSet rs, int shift) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
         List<Integer> values = getListOfAttributes(entityClass).get(IDS_OF_VALUES);  // get list of Ids of Attributes
         for (int i = 0; i < values.size(); i++) {
             Field valueField = getFieldById(values.get(i), entityClass, Attribute.class);
             // then set field with the value from DB
             if (valueField.getType().equals(String.class)) {
-                setField(entity, valueField, rs.getString(i+6));  // due to first five fields are from OBJECTS table
+                setField(entity, valueField, rs.getString(i + shift));  // due to first five fields are from OBJECTS table
             } else if (valueField.getType().equals(Long.class)) {
-                setField(entity, valueField, rs.getLong(i+6));
+                setField(entity, valueField, rs.getLong(i + shift));
             } else if (valueField.getType().equals(Integer.class)) {
-                setField(entity, valueField, rs.getInt(i+6));
+                setField(entity, valueField, rs.getInt(i + shift));
             }
         }
     }
 
-    public <T extends Entity> void setDates(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
+    public <T extends Entity> void setDates(T entity, ResultSet rs, int shift) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
         List<Integer> dates = getListOfAttributes(entityClass).get(IDS_OF_DATES); // get list of Ids of dates
         for (int i = 0; i < dates.size(); i++) {
             Field dateField = getFieldById(dates.get(i), entityClass, Attribute.class);
-            setField(entity, dateField, rs.getDate(i+6));
+            setField(entity, dateField, rs.getDate(i + shift));
         }
 
     }
 
-    public <T extends Entity> void setLists(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
+    public <T extends Entity> void setLists(T entity, ResultSet rs, int shift) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
         List<Integer> lists = getListOfAttributes(entityClass).get(IDS_OF_LISTS);  // get list of Ids of lists
         for (int i = 0; i < lists.size(); i++) {
             Field listField = getFieldById(lists.get(i), entityClass, AttributeList.class);
             if (listField.getType().equals(String.class)) {
-                setField(entity, listField, rs.getString(i + 6));
+                setField(entity, listField, rs.getString(i + shift));
             } else if (listField.getType().equals(Long.class)) {
-                setField(entity, listField, rs.getLong(i + 6));
+                setField(entity, listField, rs.getLong(i + shift));
             }
         }
     }
 
-    public <T extends Entity> void setReferences(T entity, ResultSet rs) throws SQLException, IllegalAccessException {
+    public <T extends Entity> void setReferences(T entity, ResultSet rs, int shift) throws SQLException, IllegalAccessException {
         Class <? extends Entity> entityClass = entity.getClass();
         List<Integer> references = getListOfAttributes(entityClass).get(IDS_OF_REFERENCES); // get list of Ids of references
         for (int i = 0; i < references.size(); i++) {
             Field referenceField = getFieldById(references.get(i), entityClass, Reference.class);
             if (referenceField.getType().equals(String.class)) {
-                setField(entity, referenceField, rs.getString(i+6));
+                setField(entity, referenceField, rs.getString(i + shift));
             }
         }
     }
