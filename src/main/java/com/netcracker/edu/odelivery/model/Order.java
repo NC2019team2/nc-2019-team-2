@@ -30,6 +30,9 @@ public class Order extends Entity{
     @Attribute(attrId = OrderAttributes.PAYMENT_METHOD)
     private String paymentMethod;
 
+    @Reference(attrId = OrderAttributes.MANAGER_ID)
+    private Long managerId;
+
     public Long getClientId() {
         return clientId;
     }
@@ -84,5 +87,13 @@ public class Order extends Entity{
 
     public void setPaymentMethod(String paymentMethod) {
         this.paymentMethod = paymentMethod;
+    }
+
+    public Long getManagerId() {
+        return managerId;
+    }
+
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
     }
 }

@@ -10,4 +10,5 @@ public interface OrderAttributes {
     int ORDER_PRICE = 504;
     int CLIENT_LOCATION = 505;
     int PAYMENT_METHOD = 506;
+    int MANAGER_ID = 507;
 }
